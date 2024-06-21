@@ -12,3 +12,5 @@ Tenha o python3 instalado no seu computador e instale os pacotes bs4, requests, 
 Após instalar as dependências, acesse o terminal e rode o comando a seguir<br\>
 
 ```python3 scrapping-creditoreal.py``` 
+## Link para a Apresentação
+https://youtu.be/1b7Y4er1u7A
