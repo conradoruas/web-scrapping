@@ -2,6 +2,7 @@ import requests
 import json
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from statistics import mean
 
 # URL base do site de onde os dados serão extraídos
 base_url = "https://www.creditoreal.com.br/alugueis/florianopolis-sc?filters=%7B%22valueType%22%3Atrue%2C%22cityState%22%3A%22Florian%C3%B3polis_SC%22%7D&cityState=florianopolis-sc"
@@ -41,7 +42,7 @@ def parse_imovel(imovel):
         elif 'vaga' in text:
             vaga_aux = text
         elif 'R$' in text:
-            valor_aux = text.replace('\u00a0', ' ')
+            valor_aux = text.replace('\u00a0', ' ').replace('.', '').replace(',', '.')
         elif 'banheiro' in text:
             banheiro_aux = text
 
@@ -84,7 +85,7 @@ def extract_data(page_index):
 
 def main():
     resposta = []
-    num_paginas = 100
+    num_paginas = 54
 
     # Cria um pool de threads para fazer requisições em paralelo
     with ThreadPoolExecutor(max_workers=10) as executor:
@@ -108,5 +109,31 @@ def main():
 
     print("JSON gerado e salvo em 'imoveis_credito-real.json'")
 
-if __name__ == "__main__":
+    # Gerar insights a partir dos dados coletados
+    gerar_insights(resposta)
+
+def gerar_insights(dados):
+    """Gera insights a partir dos dados coletados"""
+    valores = []
+    areas = []
+    quartos = []
+
+    for imovel in dados:
+        if imovel['VALOR'] != 'Sem valor informado':
+            valores.append(float(imovel['VALOR'].replace('R$', '').strip()))
+        if imovel['AREA'] != 'Sem área informada':
+            areas.append(float(imovel['AREA'].replace('m²', '').strip()))
+        if imovel['QUARTOS'] != 'Sem quartos informados':
+            quartos.append(int(imovel['QUARTOS'].split()[0]))
+
+    media_valor = mean(valores) if valores else 0
+    media_area = mean(areas) if areas else 0
+    media_quartos = mean(quartos) if quartos else 0
+
+    print("\nInsights dos dados coletados:")
+    print(f"Média do aluguel dos imóveis: R$ {media_valor:.2f}")
+    print(f"Média de área dos imóveis: {media_area:.2f} m²")
+    print(f"Média de quantidade de quartos: {media_quartos:.2f}")
+
+if __name__ == "_main_":
     main()
