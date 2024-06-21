@@ -135,5 +135,5 @@ def gerar_insights(dados):
     print(f"Média de área dos imóveis: {media_area:.2f} m²")
     print(f"Média de quantidade de quartos: {media_quartos:.2f}")
 
-if __name__ == "_main_":
+if __name__ == "__main__":
     main()
